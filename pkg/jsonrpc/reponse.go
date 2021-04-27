@@ -5,10 +5,9 @@ import (
 )
 
 type Response struct {
-	shouldReturn bool
-	result       interface{}
-	error        Error
-	id           ID
+	result interface{}
+	error  Error
+	id     ID
 }
 
 func (r Response) HasError() bool {
@@ -16,8 +15,7 @@ func (r Response) HasError() bool {
 }
 
 func (r Response) MarshalJSON() ([]byte, error) {
-	id, _ := r.id.toValue()
-	body := map[string]interface{}{"jsonrpc": Version, "id": id}
+	body := map[string]interface{}{"jsonrpc": Version}
 	if r.HasError() {
 		e := map[string]interface{}{"code": r.error.code(), "message": r.error.message()}
 		if r.error.data() != nil {
@@ -26,6 +24,9 @@ func (r Response) MarshalJSON() ([]byte, error) {
 		body["error"] = e
 	} else {
 		body["result"] = r.result
+	}
+	if id, ok := r.id.toValue(); ok {
+		body["id"] = id
 	}
 	return json.Marshal(body)
 }

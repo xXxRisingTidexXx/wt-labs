@@ -2,6 +2,7 @@ package jsonrpc
 
 import (
 	"encoding/json"
+	"io"
 )
 
 type Response struct {
@@ -16,6 +17,10 @@ func NewResult(result interface{}) Response {
 
 func NewError(e Error) Response {
 	return Response{error: e}
+}
+
+func ParseResponse(reader io.Reader) (Response, Error) {
+	return Response{}, nil
 }
 
 func (r Response) HasError() bool {

@@ -42,7 +42,7 @@ func (s *Server) writeResponse(
 	}
 	if !isNotification {
 		if err := json.NewEncoder(writer).Encode(response); err != nil {
-			logError(wrappedError{err})
+			logError(serverError{err})
 		}
 	}
 }

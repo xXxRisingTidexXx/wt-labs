@@ -8,14 +8,14 @@ import (
 
 type Server struct {
 	methods map[string]Method
-	logger  log.FieldLogger
 }
 
 func NewServer(methods map[string]Method) *Server {
-	return &Server{methods, log.New()}
+	return &Server{methods}
 }
 
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
 	r, e := ParseRequest(request.Body)
 	if e != nil {
 		s.writeResponse(Response{error: e, id: nullID{}}, true, writer)
@@ -34,15 +34,15 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 func (s *Server) writeResponse(response Response, shouldReply bool, writer http.ResponseWriter) {
 	if response.HasError() {
-		s.logError(response.error)
+		logError(response.error)
 	}
 	if shouldReply {
 		if err := json.NewEncoder(writer).Encode(response); err != nil {
-			s.logError(wrappedError{err})
+			logError(wrappedError{err})
 		}
 	}
 }
 
-func (s *Server) logError(e Error) {
-	s.logger.WithFields(log.Fields{"code": e.code(), "data": e.data()}).Error(e.message())
+func logError(e Error) {
+	log.WithFields(log.Fields{"code": e.code(), "data": e.data()}).Error(e.message())
 }

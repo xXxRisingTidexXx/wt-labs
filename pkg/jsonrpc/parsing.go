@@ -28,22 +28,22 @@ func ParseRequest(reader io.Reader) (Request, Error) {
 		return request, invalidRequest{"Field \"method\" is not string"}
 	}
 	delete(body, "method")
-	params, ok := body["params"]
-	if !ok {
-		return request, invalidRequest{"Field \"params\" is absent"}
+	if params, ok := body["params"]; ok {
+		switch params := params.(type) {
+		case []interface{}:
+			request.params = positionalParams(params)
+		case map[string]interface{}:
+			request.params = namedParams(params)
+		default:
+			return request, invalidRequest{"Field \"params\" is neither array nor object"}
+		}
+		delete(body, "params")
+	} else {
+		request.params = emptyParams{}
 	}
-	switch params := params.(type) {
-	case []interface{}:
-		request.params = positionalParams(params)
-	case map[string]interface{}:
-		request.params = namedParams(params)
-	default:
-		return request, invalidRequest{"Field \"params\" is neither array nor object"}
-	}
-	delete(body, "params")
 	if id, ok := body["id"]; ok {
 		switch id := id.(type) {
-		case int64:
+		case float64:
 			request.id = numberID(id)
 		case string:
 			request.id = stringID(id)
@@ -52,10 +52,10 @@ func ParseRequest(reader io.Reader) (Request, Error) {
 		default:
 			return request, invalidRequest{"Field \"id\" is neither number nor string nor null"}
 		}
+		delete(body, "id")
 	} else {
 		request.id = notificationID{}
 	}
-	delete(body, "id")
 	if len(body) > 0 {
 		return request, invalidRequest{"Request contains extra fields"}
 	}

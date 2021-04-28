@@ -18,7 +18,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	r, e := ParseRequest(request.Body)
 	if e != nil {
-		s.writeResponse(Response{error: e, id: nullID{}}, true, writer)
+		s.writeResponse(Response{error: e, id: nullID{}}, false, writer)
 	} else if method, ok := s.methods[r.method]; !ok {
 		s.writeResponse(
 			Response{error: methodNotFound{r.method}, id: r.id},
@@ -32,11 +32,15 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func (s *Server) writeResponse(response Response, shouldReply bool, writer http.ResponseWriter) {
+func (s *Server) writeResponse(
+	response Response,
+	isNotification bool,
+	writer http.ResponseWriter,
+) {
 	if response.HasError() {
 		logError(response.error)
 	}
-	if shouldReply {
+	if !isNotification {
 		if err := json.NewEncoder(writer).Encode(response); err != nil {
 			logError(wrappedError{err})
 		}

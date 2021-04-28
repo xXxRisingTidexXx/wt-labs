@@ -10,6 +10,14 @@ type Response struct {
 	id     ID
 }
 
+func NewResult(result interface{}) Response {
+	return Response{result: result}
+}
+
+func NewError(e Error) Response {
+	return Response{error: e}
+}
+
 func (r Response) HasError() bool {
 	return r.error != nil
 }

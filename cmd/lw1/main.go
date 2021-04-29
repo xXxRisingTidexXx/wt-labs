@@ -12,7 +12,7 @@ func main() {
 }
 
 func handleRoot(writer http.ResponseWriter, _ *http.Request) {
-	if _, err := writer.Write([]byte("Hello from LW6!\n")); err != nil {
+	if _, err := writer.Write([]byte("Hello from LW1!\n")); err != nil {
 		log.Errorf("main: lw1 failed to write response, %v", err)
 	}
 }

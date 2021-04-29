@@ -12,10 +12,10 @@ func main() {
 	log.SetReportCaller(true)
 	client := jsonrpc.NewClient(&http.Client{Timeout: 5 * time.Second}, "http://localhost:8484")
 	log.Info(
-		client.Call(jsonrpc.NewRequest("Pizda", jsonrpc.NewEmpty(), jsonrpc.NewInt(181023))),
+		client.Call(jsonrpc.NewRequest("Add", jsonrpc.NewEmpty(), jsonrpc.NewInt(181023))),
 	)
 	log.Info(
-		client.Call(jsonrpc.NewRequest("Pizda", jsonrpc.NewEmpty(), jsonrpc.NewNotification())),
+		client.Call(jsonrpc.NewRequest("Add", jsonrpc.NewEmpty(), jsonrpc.NewNotification())),
 	)
 	log.Info(
 		client.Call(jsonrpc.NewRequest("Greet", jsonrpc.NewEmpty(), jsonrpc.NewString("abfwefds"))),

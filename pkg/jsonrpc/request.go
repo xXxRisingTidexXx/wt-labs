@@ -31,11 +31,8 @@ func ParseRequest(reader io.Reader) (Request, Error) {
 	if !ok {
 		return request, invalidRequest{"Field \"method\" is absent"}
 	}
-	switch method := method.(type) {
-	case string:
-		request.method = method
-	default:
-		return request, invalidRequest{"Field \"method\" is not string"}
+	if request.method, ok = method.(string); !ok {
+		return request, invalidRequest{"Field \"method\" is not a string"}
 	}
 	delete(body, "method")
 	if params, ok := body["params"]; ok {

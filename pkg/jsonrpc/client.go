@@ -18,30 +18,30 @@ func NewClient(client *http.Client, url string) *Client {
 func (c *Client) Call(request Request) Response {
 	data, err := json.Marshal(request)
 	if err != nil {
-		return Response{error: clientError{err}, id: nullID{}}
+		return NewError(clientError{err})
 	}
 	response, err := c.client.Post(c.url, "application/json", bytes.NewBuffer(data))
 	if err != nil {
-		return Response{error: clientError{err}, id: nullID{}}
+		return NewError(clientError{err})
 	}
 	if response.StatusCode != http.StatusOK {
 		_ = response.Body.Close()
-		return Response{error: notOKError{response.Status}, id: nullID{}}
+		return NewError(notOKError{response.Status})
 	}
 	if request.IsNotification() {
 		_ = response.Body.Close()
-		return Response{result: "OK"}
+		return NewResult("OK")
 	}
 	r, e := ParseResponse(response.Body)
 	if e != nil {
 		_ = response.Body.Close()
-		return Response{error: e, id: nullID{}}
+		return NewError(e)
 	}
 	if err := response.Body.Close(); err != nil {
-		return Response{error: clientError{err}, id: nullID{}}
+		return NewError(clientError{err})
 	}
 	if !r.HasError() && r.id != request.id {
-		return Response{error: idMismatch{request.id, r.id}, id: nullID{}}
+		return NewError(idMismatch{request.id, r.id})
 	}
 	return r
 }

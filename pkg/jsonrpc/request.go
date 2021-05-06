@@ -27,7 +27,7 @@ func newRequest(
 	if params != nil {
 		var err error
 		if request.params, err = json.Marshal(params); err != nil {
-			return request, parseError{err}
+			return request, stringifyError{err}
 		}
 	}
 	return request, nil

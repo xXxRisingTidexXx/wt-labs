@@ -6,13 +6,17 @@ import (
 )
 
 type Response struct {
-	result interface{}
+	result []byte
 	error  Error
 	id     interface{}
 }
 
 func NewResult(result interface{}) Response {
-	return Response{result: result}
+	bytes, err := json.Marshal(result)
+	if err != nil {
+		return Response{error: stringifyError{err}}
+	}
+	return Response{result: bytes}
 }
 
 func NewError(e Error) Response {
@@ -21,14 +25,22 @@ func NewError(e Error) Response {
 
 func ParseResponse(reader io.Reader) (Response, Error) {
 	var (
-		body1    map[string]interface{}
+		body1    map[string]json.RawMessage
 		response Response
+		version  string
 	)
 	if err := json.NewDecoder(reader).Decode(&body1); err != nil {
 		return response, clientError{err}
 	}
-	if version, ok := body1["jsonrpc"]; !ok || version != Version {
-		return response, invalidResponse{"Field \"jsonrpc\" is either absent or invalid"}
+	message, ok := body1["jsonrpc"]
+	if !ok {
+		return response, invalidResponse{"Field \"jsonrpc\" is absent"}
+	}
+	if err := json.Unmarshal(message, &version); err != nil {
+		return response, clientError{err}
+	}
+	if version != Version {
+		return response, invalidResponse{"Field \"jsonrpc\" is invalid"}
 	}
 	delete(body1, "jsonrpc")
 	result, ok1 := body1["result"]
@@ -43,9 +55,9 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 		response.result = result
 		delete(body1, "result")
 	} else {
-		body2, ok := e.(map[string]interface{})
-		if !ok {
-			return response, invalidResponse{"Field \"error\" is not an object"}
+		var body2 map[string]interface{}
+		if err := json.Unmarshal(e, &body2); err != nil {
+			return response, clientError{err}
 		}
 		code, ok := body2["code"]
 		if !ok {
@@ -56,11 +68,11 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 			return response, invalidResponse{"Field \"code\" is not a number"}
 		}
 		delete(body2, "code")
-		message, ok := body2["message"]
+		text, ok := body2["message"]
 		if !ok {
 			return response, invalidResponse{"Field \"message\" is absent"}
 		}
-		m, ok := message.(string)
+		m, ok := text.(string)
 		if !ok {
 			return response, invalidResponse{"Field \"message\" is not a number"}
 		}
@@ -72,23 +84,24 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 		}
 		delete(body1, "error")
 	}
-	//id, ok := body1["id"]
-	//if !ok {
-	//	return response, invalidResponse{"Field \"id\" is absent"}
-	//}
-	//switch id := id.(type) {
-	//case float64:
-	//	response.id = numberID(id)
-	//case string:
-	//	response.id = stringID(id)
-	//case nil:
-	//	if !response.HasError() {
-	//		return response, invalidResponse{"Field \"id\" can be null just in a case of error"}
-	//	}
-	//	response.id = nullID{}
-	//default:
-	//	return response, invalidResponse{"Field \"id\" is neither number nor string nor null"}
-	//}
+	message, ok = body1["id"]
+	if !ok {
+		return response, invalidResponse{"Field \"id\" is absent"}
+	}
+	if err := json.Unmarshal(message, &response.id); err != nil {
+		return response, clientError{err}
+	}
+	switch id := response.id.(type) {
+	case float64:
+		response.id = int64(id)
+	case string:
+	case nil:
+		if !response.HasError() {
+			return response, invalidResponse{"Field \"id\" can be null just in a case of error"}
+		}
+	default:
+		return response, invalidResponse{"Field \"id\" is neither number nor string nor null"}
+	}
 	delete(body1, "id")
 	if len(body1) > 0 {
 		return response, invalidResponse{"Response contains extra fields"}
@@ -100,8 +113,15 @@ func (r Response) HasError() bool {
 	return r.error != nil
 }
 
+func (r Response) UnmarshalResult(value interface{}) Error {
+	if err := json.Unmarshal(r.result, value); err != nil {
+		return clientError{err}
+	}
+	return nil
+}
+
 func (r Response) MarshalJSON() ([]byte, error) {
-	body := map[string]interface{}{"jsonrpc": Version}
+	body := map[string]interface{}{"jsonrpc": Version, "id": r.id}
 	if r.HasError() {
 		e := map[string]interface{}{"code": r.error.code(), "message": r.error.message()}
 		if r.error.data() != nil {
@@ -109,10 +129,7 @@ func (r Response) MarshalJSON() ([]byte, error) {
 		}
 		body["error"] = e
 	} else {
-		body["result"] = r.result
+		body["result"] = json.RawMessage(r.result)
 	}
-	//if id, ok := r.id.toValue(); ok {
-	//	body["id"] = id
-	//}
 	return json.Marshal(body)
 }

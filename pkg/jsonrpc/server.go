@@ -18,7 +18,7 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	r, e := ParseRequest(request.Body)
 	if e != nil {
-		s.writeResponse(Response{error: e, id: nullID{}}, false, writer)
+		s.writeResponse(NewError(e), false, writer)
 	} else if method, ok := s.methods[r.method]; !ok {
 		s.writeResponse(
 			Response{error: methodNotFound{r.method}, id: r.id},

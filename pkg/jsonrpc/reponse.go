@@ -8,7 +8,7 @@ import (
 type Response struct {
 	result interface{}
 	error  Error
-	id     ID
+	id     interface{}
 }
 
 func NewResult(result interface{}) Response {
@@ -72,23 +72,23 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 		}
 		delete(body1, "error")
 	}
-	id, ok := body1["id"]
-	if !ok {
-		return response, invalidResponse{"Field \"id\" is absent"}
-	}
-	switch id := id.(type) {
-	case float64:
-		response.id = numberID(id)
-	case string:
-		response.id = stringID(id)
-	case nil:
-		if !response.HasError() {
-			return response, invalidResponse{"Field \"id\" can be null just in a case of error"}
-		}
-		response.id = nullID{}
-	default:
-		return response, invalidResponse{"Field \"id\" is neither number nor string nor null"}
-	}
+	//id, ok := body1["id"]
+	//if !ok {
+	//	return response, invalidResponse{"Field \"id\" is absent"}
+	//}
+	//switch id := id.(type) {
+	//case float64:
+	//	response.id = numberID(id)
+	//case string:
+	//	response.id = stringID(id)
+	//case nil:
+	//	if !response.HasError() {
+	//		return response, invalidResponse{"Field \"id\" can be null just in a case of error"}
+	//	}
+	//	response.id = nullID{}
+	//default:
+	//	return response, invalidResponse{"Field \"id\" is neither number nor string nor null"}
+	//}
 	delete(body1, "id")
 	if len(body1) > 0 {
 		return response, invalidResponse{"Response contains extra fields"}
@@ -111,8 +111,8 @@ func (r Response) MarshalJSON() ([]byte, error) {
 	} else {
 		body["result"] = r.result
 	}
-	if id, ok := r.id.toValue(); ok {
-		body["id"] = id
-	}
+	//if id, ok := r.id.toValue(); ok {
+	//	body["id"] = id
+	//}
 	return json.Marshal(body)
 }

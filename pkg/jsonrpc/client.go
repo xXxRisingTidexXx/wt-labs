@@ -30,7 +30,7 @@ func (c *Client) Call(request Request) Response {
 	}
 	if request.IsNotification() {
 		_ = response.Body.Close()
-		return Response{result: "OK", id: notificationID{}}
+		return Response{result: "OK"}
 	}
 	r, e := ParseResponse(response.Body)
 	if e != nil {

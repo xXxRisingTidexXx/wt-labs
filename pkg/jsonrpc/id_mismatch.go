@@ -1,8 +1,8 @@
 package jsonrpc
 
 type idMismatch struct {
-	expected ID
-	actual   ID
+	expected interface{}
+	actual   interface{}
 }
 
 func (m idMismatch) code() int {
@@ -14,5 +14,5 @@ func (m idMismatch) message() string {
 }
 
 func (m idMismatch) data() interface{} {
-	return map[string]ID{"expected": m.expected, "actual": m.actual}
+	return map[string]interface{}{"expected": m.expected, "actual": m.actual}
 }

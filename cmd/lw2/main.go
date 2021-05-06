@@ -10,14 +10,5 @@ import (
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetReportCaller(true)
-	client := jsonrpc.NewClient(&http.Client{Timeout: 5 * time.Second}, "http://localhost:8484")
-	log.Info(
-		client.Call(jsonrpc.NewRequest("Add", jsonrpc.NewEmpty(), jsonrpc.NewInt(181023))),
-	)
-	log.Info(
-		client.Call(jsonrpc.NewRequest("Add", jsonrpc.NewEmpty(), jsonrpc.NewNotification())),
-	)
-	log.Info(
-		client.Call(jsonrpc.NewRequest("Greet", jsonrpc.NewEmpty(), jsonrpc.NewString("abfwefds"))),
-	)
+	_ = jsonrpc.NewClient(&http.Client{Timeout: 5 * time.Second}, "http://localhost:8484")
 }

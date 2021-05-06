@@ -12,6 +12,10 @@ var Greet = jsonrpc.MethodFunc(
 
 var Square = jsonrpc.MethodFunc(
 	func(request jsonrpc.Request) jsonrpc.Response {
-		return jsonrpc.NewResult(12)
+		var params []float64
+		if e := request.UnmarshalParams(&params); e != nil {
+			return jsonrpc.NewError(e)
+		}
+		return jsonrpc.NewResult(params[0] * params[0])
 	},
 )

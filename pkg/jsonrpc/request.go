@@ -96,7 +96,7 @@ func (r Request) IsNotification() bool {
 
 func (r Request) UnmarshalParams(value interface{}) Error {
 	if err := json.Unmarshal(r.params, value); err != nil {
-		return parseError{err}
+		return invalidParams{err}
 	}
 	return nil
 }

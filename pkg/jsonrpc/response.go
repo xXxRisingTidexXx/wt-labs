@@ -115,7 +115,7 @@ func (r Response) HasError() bool {
 
 func (r Response) UnmarshalResult(value interface{}) Error {
 	if err := json.Unmarshal(r.result, value); err != nil {
-		return clientError{err}
+		return invalidResult{err}
 	}
 	return nil
 }

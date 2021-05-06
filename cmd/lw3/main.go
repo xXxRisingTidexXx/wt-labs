@@ -16,7 +16,9 @@ func main() {
 		ReadTimeout:    15 * time.Second,
 		WriteTimeout:   15 * time.Second,
 		MaxHeaderBytes: 1048576,
-		Handler:        jsonrpc.NewServer(map[string]jsonrpc.Method{"Greet": methods.Greet}),
+		Handler: jsonrpc.NewServer(
+			map[string]jsonrpc.Method{"Greet": methods.Greet, "Square": methods.Square},
+		),
 	}
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("main: lw3 failed to start the server, %v", err)

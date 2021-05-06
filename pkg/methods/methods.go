@@ -9,3 +9,9 @@ var Greet = jsonrpc.MethodFunc(
 		return jsonrpc.NewResult("Hello from JSONRPC!")
 	},
 )
+
+var Square = jsonrpc.MethodFunc(
+	func(request jsonrpc.Request) jsonrpc.Response {
+		return jsonrpc.NewResult(12)
+	},
+)

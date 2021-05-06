@@ -6,6 +6,10 @@ type structuredError struct {
 	d interface{}
 }
 
+func NewStructuredError(code int, message string, data interface{}) Error {
+	return structuredError{code, message, data}
+}
+
 func (e structuredError) code() int {
 	return e.c
 }

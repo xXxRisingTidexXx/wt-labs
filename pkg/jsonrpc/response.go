@@ -11,7 +11,7 @@ type Response struct {
 	id     interface{}
 }
 
-func NewResult(result interface{}) Response {
+func WithResult(result interface{}) Response {
 	bytes, err := json.Marshal(result)
 	if err != nil {
 		return Response{error: stringifyError{err}}
@@ -19,7 +19,7 @@ func NewResult(result interface{}) Response {
 	return Response{result: bytes}
 }
 
-func NewError(e Error) Response {
+func WithError(e Error) Response {
 	return Response{error: e}
 }
 

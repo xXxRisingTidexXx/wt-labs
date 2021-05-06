@@ -1,7 +1,15 @@
 package jsonrpc
 
+import (
+	"fmt"
+)
+
 type invalidParams struct {
 	err error
+}
+
+func NewInvalidParams(message string) Error {
+	return invalidParams{fmt.Errorf(message)}
 }
 
 func (p invalidParams) code() int {
@@ -13,5 +21,5 @@ func (p invalidParams) message() string {
 }
 
 func (p invalidParams) data() interface{} {
-	return p.err
+	return p.err.Error()
 }

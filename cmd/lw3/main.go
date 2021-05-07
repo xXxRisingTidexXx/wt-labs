@@ -17,7 +17,11 @@ func main() {
 		WriteTimeout:   15 * time.Second,
 		MaxHeaderBytes: 1048576,
 		Handler: jsonrpc.NewServer(
-			map[string]jsonrpc.Method{"Greet": methods.Greet, "Square": methods.Square},
+			map[string]jsonrpc.Method{
+				"Greet":   methods.Greet,
+				"Square":  methods.Square,
+				"StoreIP": methods.StoreIP,
+			},
 		),
 	}
 	if err := server.ListenAndServe(); err != nil {

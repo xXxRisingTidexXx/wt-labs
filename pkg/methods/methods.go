@@ -3,6 +3,7 @@ package methods
 import (
 	"github.com/xXxRisingTidexXx/wt-labs/pkg/jsonrpc"
 	"os"
+	"time"
 )
 
 var Greet = jsonrpc.MethodFunc(
@@ -33,12 +34,17 @@ var StoreIP = jsonrpc.MethodFunc(
 		if len(params) != 1 {
 			return jsonrpc.WithError(jsonrpc.NewInvalidParams("Param number must equal 1"))
 		}
-		file, err := os.OpenFile("registry.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile("logs/ballantines.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			return jsonrpc.WithError(jsonrpc.NewStructuredError(1000, "Append failed", err))
+			return jsonrpc.WithError(jsonrpc.NewStructuredError(1000, "Opening failed", err))
 		}
-		if _, err := file.WriteString(params[0] + "\n"); err != nil {
-			return jsonrpc.WithError(jsonrpc.NewStructuredError())
+		_, err = file.WriteString(time.Now().Format(time.RFC3339) + "," + params[0] + "\n")
+		if err != nil {
+			_ = file.Close()
+			return jsonrpc.WithError(jsonrpc.NewStructuredError(1001, "Writing failed", err))
+		}
+		if err := file.Close(); err != nil {
+			return jsonrpc.WithError(jsonrpc.NewStructuredError(1002, "Closing failed", err))
 		}
 		return jsonrpc.WithResult("OK")
 	},

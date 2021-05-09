@@ -37,7 +37,7 @@ var StoreIP = jsonrpc.MethodFunc(
 		if err := os.Mkdir("logs", 0755); err != nil && !os.IsExist(err) {
 			return jsonrpc.WithError(jsonrpc.NewStructuredError(1000, "Mkdir failed", err))
 		}
-		file, err := os.OpenFile("logs/ballantines.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile("logs/access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return jsonrpc.WithError(jsonrpc.NewStructuredError(1001, "Opening failed", err))
 		}

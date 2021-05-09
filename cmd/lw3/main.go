@@ -25,6 +25,6 @@ func main() {
 		),
 	}
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("main: lw3 failed to start the server, %v", err)
+		log.Fatal(err)
 	}
 }

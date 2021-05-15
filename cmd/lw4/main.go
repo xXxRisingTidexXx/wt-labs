@@ -13,11 +13,13 @@ func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetReportCaller(true)
 	server := &http.Server{
-		Addr: ":80",
+		Addr:           ":80",
 		ReadTimeout:    15 * time.Second,
 		WriteTimeout:   15 * time.Second,
 		MaxHeaderBytes: 1048576,
-		Handler: jsonrpc.NewServer(map[string]jsonrpc.Method{"Greet": wt.Greet}),
+		Handler: jsonrpc.NewServer(
+			map[string]jsonrpc.Method{"PropagateIP": &wt.Propagator{}},
+		),
 	}
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)

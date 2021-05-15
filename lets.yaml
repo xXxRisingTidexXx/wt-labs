@@ -8,5 +8,5 @@ commands:
   run:
     description: Launches the whole ecosystem
     cmd: |
-      docker-compose up app-ballantines
+      docker-compose up app-ballantines app-dmf app-magellan app-becherovka app-xenta app-baileys app-tokaji
       docker-compose down

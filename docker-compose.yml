@@ -16,10 +16,10 @@ x-app: &x-app
     - ./cmd:/go/src/app/cmd
     - ./pkg:/go/src/app/pkg
     - ./internal:/go/src/app/internal
-  environment:
-    WT_DSN: postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable
   depends_on:
     - database
+x-environment: &x-environment
+  WT_DSN: postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable
 services:
   database:
     image: postgres:13.2-alpine
@@ -53,7 +53,58 @@ services:
     <<: *x-app
     container_name: wt-app-ballantines
     ports:
-      - 9292:9292
+      - 9292:80
+    environment:
+      <<: *x-environment
+      WT_NODE: ballantines
+  app-dmf:
+    <<: *x-app
+    container_name: wt-app-dmf
+    ports:
+      - 9293:80
+    environment:
+      <<: *x-environment
+      WT_NODE: dmf
+  app-magellan:
+    <<: *x-app
+    container_name: wt-app-magellan
+    ports:
+      - 9294:80
+    environment:
+      <<: *x-environment
+      WT_NODE: magellan
+  app-becherovka:
+    <<: *x-app
+    container_name: wt-app-becherovka
+    ports:
+      - 9295:80
+    environment:
+      <<: *x-environment
+      WT_NODE: becherovka
+  app-xenta:
+    <<: *x-app
+    container_name: wt-app-xenta
+    ports:
+      - 9296:80
+    environment:
+      <<: *x-environment
+      WT_NODE: xenta
+  app-baileys:
+    <<: *x-app
+    container_name: wt-app-baileys
+    ports:
+      - 9297:80
+    environment:
+      <<: *x-environment
+      WT_NODE: baileys
+  app-tokaji:
+    <<: *x-app
+    container_name: wt-app-tokaji
+    ports:
+      - 9298:80
+    environment:
+      <<: *x-environment
+      WT_NODE: tokaji
 volumes:
   database:
     name: wt-database

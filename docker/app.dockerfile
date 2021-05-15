@@ -7,5 +7,5 @@ ADD https://raw.githubusercontent.com/eficode/wait-for/master/wait-for .
 COPY go.mod .
 COPY go.sum .
 COPY cmd cmd
-COPY internal internal
+COPY pkg pkg
 RUN chmod +x wait-for && apk add --no-cache git && go get ./...

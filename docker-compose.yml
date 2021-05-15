@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  database:
+    image: postgres:13.2-alpine
+    container_name: wt-database
+    ports:
+      - 5432:5432
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: wt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/migrate.dockerfile
+    image: wt-migrate
+    container_name: wt-migrate
+    entrypoint: ./wait-for wt-database:5432 -t 10 -- migrate
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - database
+  app:
+    build:
+      context: .
+      dockerfile: docker/app.dockerfile
+    image: wt-app
+    container_name: wt-app
+    command:
+      - ./wait-for
+      - wt-database:5432
+      - -t
+      - '10'
+      - --
+      - go
+      - run
+      - github.com/xXxRisingTidexXx/wt-labs/cmd/lw4
+    volumes:
+      - ./go.mod:/go/src/app/go.mod
+      - ./go.sum:/go/src/app/go.sum
+      - ./cmd:/go/src/app/cmd
+      - ./internal:/go/src/app/internal
+    environment:
+      WT_DSN: postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable
+    depends_on:
+      - database
+volumes:
+  database:
+    name: wt-database
+networks:
+  default:
+    name: wt-default

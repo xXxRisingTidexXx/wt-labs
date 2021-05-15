@@ -8,4 +8,5 @@ COPY go.mod .
 COPY go.sum .
 COPY cmd cmd
 COPY pkg pkg
+COPY internal internal
 RUN chmod +x wait-for && apk add --no-cache git && go get ./...

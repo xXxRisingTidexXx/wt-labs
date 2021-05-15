@@ -1,4 +1,4 @@
-package methods
+package wt
 
 import (
 	"github.com/xXxRisingTidexXx/wt-labs/pkg/jsonrpc"

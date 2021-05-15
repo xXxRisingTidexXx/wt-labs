@@ -1,0 +1,12 @@
+shell: bash
+commands:
+  migrate:
+    description: Upgrades the DB schema
+    cmd: |
+      docker-compose run --rm migrate -path migrations -database postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable up
+      docker-compose down
+  run:
+    description: Launches the whole ecosystem
+    cmd: |
+      docker-compose up app
+      docker-compose down

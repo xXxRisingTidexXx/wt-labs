@@ -1,4 +1,25 @@
 version: '3.8'
+x-app: &x-app
+  image: wt-app
+  command:
+    - ./wait-for
+    - wt-database:5432
+    - -t
+    - '10'
+    - --
+    - go
+    - run
+    - github.com/xXxRisingTidexXx/wt-labs/cmd/lw4
+  volumes:
+    - ./go.mod:/go/src/app/go.mod
+    - ./go.sum:/go/src/app/go.sum
+    - ./cmd:/go/src/app/cmd
+    - ./pkg:/go/src/app/pkg
+    - ./internal:/go/src/app/internal
+  environment:
+    WT_DSN: postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable
+  depends_on:
+    - database
 services:
   database:
     image: postgres:13.2-alpine
@@ -28,28 +49,11 @@ services:
       context: .
       dockerfile: docker/app.dockerfile
     image: wt-app
-    container_name: wt-app
-    command:
-      - ./wait-for
-      - wt-database:5432
-      - -t
-      - '10'
-      - --
-      - go
-      - run
-      - github.com/xXxRisingTidexXx/wt-labs/cmd/lw4
-    volumes:
-      - ./go.mod:/go/src/app/go.mod
-      - ./go.sum:/go/src/app/go.sum
-      - ./cmd:/go/src/app/cmd
-      - ./pkg:/go/src/app/pkg
-      - ./internal:/go/src/app/internal
+  app-ballantines:
+    <<: *x-app
+    container_name: wt-app-ballantines
     ports:
       - 9292:9292
-    environment:
-      WT_DSN: postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable
-    depends_on:
-      - database
 volumes:
   database:
     name: wt-database

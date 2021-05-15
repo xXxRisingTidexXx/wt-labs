@@ -5,8 +5,8 @@ commands:
     cmd: |
       docker-compose run --rm migrate -path migrations -database postgres://postgres:postgres@wt-database:5432/wt?sslmode=disable up
       docker-compose down
-  app:
+  run:
     description: Launches the whole ecosystem
     cmd: |
-      docker-compose up app
+      docker-compose up app-ballantines
       docker-compose down

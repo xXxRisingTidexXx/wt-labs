@@ -9,4 +9,5 @@ COPY go.sum .
 COPY cmd cmd
 COPY pkg pkg
 COPY internal internal
+COPY config.yaml config.yaml
 RUN chmod +x wait-for && apk add --no-cache git && go get ./...

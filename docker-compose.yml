@@ -9,7 +9,7 @@ x-app: &x-app
     - --
     - go
     - run
-    - github.com/xXxRisingTidexXx/wt-labs/cmd/lw4
+    - github.com/xXxRisingTidexXx/wt-labs/cmd/lw5
   volumes:
     - ./go.mod:/go/src/app/go.mod
     - ./go.sum:/go/src/app/go.sum

@@ -2,7 +2,6 @@ package jsonrpc
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -38,15 +37,11 @@ func (s *Server) writeResponse(
 	writer http.ResponseWriter,
 ) {
 	if response.HasError() {
-		logError(response.error)
+		LogError(response.error)
 	}
 	if !isNotification {
 		if err := json.NewEncoder(writer).Encode(response); err != nil {
-			logError(serverError{err})
+			LogError(serverError{err})
 		}
 	}
-}
-
-func logError(e Error) {
-	log.WithFields(log.Fields{"code": e.code(), "data": e.data()}).Error(e.message())
 }

@@ -2,7 +2,6 @@ package wt
 
 import (
 	"database/sql"
-	log "github.com/sirupsen/logrus"
 	"github.com/xXxRisingTidexXx/wt-labs/internal/config"
 	"github.com/xXxRisingTidexXx/wt-labs/pkg/jsonrpc"
 	"net"
@@ -36,7 +35,6 @@ func (p *Propagator) ServeJSONRPC(request jsonrpc.Request) jsonrpc.Response {
 	if len(ips) != 1 {
 		return jsonrpc.WithError(jsonrpc.NewInvalidParams("IP number must equal 1"))
 	}
-	log.Info(ips[0])
 	go p.propagateIP(ips[0])
 	return jsonrpc.WithResult(p.source)
 }
@@ -109,30 +107,9 @@ func (p *Propagator) storeIP(ip net.IP) ([]string, error) {
 }
 
 func (p *Propagator) sendIP(target string, ip net.IP) {
-	if e := p.sendIPWithError(target, ip); e != nil {
+	if request, e := jsonrpc.NewRequest(p.method, []net.IP{ip}); e != nil {
 		jsonrpc.LogError(e)
+	} else if response := p.clients[target].Call(request); response.Error() != nil {
+		jsonrpc.LogError(response.Error())
 	}
-}
-
-func (p *Propagator) sendIPWithError(target string, ip net.IP) jsonrpc.Error {
-	request, e := jsonrpc.NewRequest(p.method, []net.IP{ip})
-	if e != nil {
-		return e
-	}
-	response := p.clients[target].Call(request)
-	if e := response.Error(); e != nil {
-		return e
-	}
-	var node string
-	if e := response.UnmarshalResult(&node); e != nil {
-		return e
-	}
-	if target != node {
-		return jsonrpc.NewStructuredError(
-			1002,
-			"Node mismatch",
-			map[string]string{"actual": node, "expected": target},
-		)
-	}
-	return nil
 }

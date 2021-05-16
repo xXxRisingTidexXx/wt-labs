@@ -14,6 +14,10 @@ func NewSet(items []string) Set {
 	return set
 }
 
+func (s Set) Add(key string) {
+	s[key] = struct{}{}
+}
+
 func (s Set) Has(key string) bool {
 	_, ok := s[key]
 	return ok

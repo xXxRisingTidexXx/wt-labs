@@ -1,9 +1,14 @@
 ballantines:
   - dmf
+dmf:
+  - magellan
+magellan:
+  - becherovka
+becherovka:
+  - xenta
+xenta:
+  - baileys
+baileys:
   - tokaji
-dmf: []
-magellan: []
-becherovka: []
-xenta: []
-baileys: []
-tokaji: []
+tokaji:
+  - ballantines

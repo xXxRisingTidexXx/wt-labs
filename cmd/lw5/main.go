@@ -26,6 +26,7 @@ func main() {
 		_ = db.Close()
 		log.Fatal(err)
 	}
+	method := "PropagateIP"
 	server := &http.Server{
 		Addr:           ":80",
 		ReadTimeout:    15 * time.Second,
@@ -33,7 +34,7 @@ func main() {
 		MaxHeaderBytes: 1048576,
 		Handler: jsonrpc.NewServer(
 			map[string]jsonrpc.Method{
-				"PropagateIP": wt.NewPropagator(c.Node, c.Graph[c.Node].ToSlice(), db),
+				method: wt.NewPropagator(method, c.Node, c.Graph[c.Node].ToSlice(), db),
 			},
 		),
 	}

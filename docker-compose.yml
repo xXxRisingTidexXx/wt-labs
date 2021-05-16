@@ -16,6 +16,7 @@ x-app: &x-app
     - ./cmd:/go/src/app/cmd
     - ./pkg:/go/src/app/pkg
     - ./internal:/go/src/app/internal
+    - ./config.yaml:/go/src/app/config.yaml
   depends_on:
     - database
 x-environment: &x-environment

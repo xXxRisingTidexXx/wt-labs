@@ -29,6 +29,9 @@ func NewConfig() (Config, error) {
 	}
 	for from, nodes := range config.Graph {
 		for to := range nodes {
+			if from == to {
+				return config, fmt.Errorf("node \"%s\" has path to itself", from)
+			}
 			if _, ok := config.Graph[to]; !ok {
 				return config, fmt.Errorf(
 					"node \"%s\" has path to missing node \"%s\"",

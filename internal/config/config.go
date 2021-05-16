@@ -27,16 +27,16 @@ func NewConfig() (Config, error) {
 	if _, ok := config.Graph[config.Node]; !ok {
 		return config, fmt.Errorf("missing path for node \"%s\"", config.Node)
 	}
-	for from, nodes := range config.Graph {
-		for to := range nodes {
-			if from == to {
-				return config, fmt.Errorf("node \"%s\" has path to itself", from)
+	for source, targets := range config.Graph {
+		for target := range targets {
+			if source == target {
+				return config, fmt.Errorf("node \"%s\" has path to itself", source)
 			}
-			if _, ok := config.Graph[to]; !ok {
+			if _, ok := config.Graph[target]; !ok {
 				return config, fmt.Errorf(
 					"node \"%s\" has path to missing node \"%s\"",
-					from,
-					to,
+					source,
+					target,
 				)
 			}
 		}

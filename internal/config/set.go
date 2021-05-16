@@ -19,6 +19,14 @@ func (s Set) Has(key string) bool {
 	return ok
 }
 
+func (s Set) ToSlice() []string {
+	items := make([]string, 0, len(s))
+	for item := range s {
+		items = append(items, item)
+	}
+	return items
+}
+
 func (s *Set) UnmarshalYAML(node *yaml.Node) error {
 	var items []string
 	if err := node.Decode(&items); err != nil {

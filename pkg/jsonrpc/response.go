@@ -96,7 +96,7 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 		response.id = int64(id)
 	case string:
 	case nil:
-		if !response.HasError() {
+		if response.error == nil {
 			return response, invalidResponse{"Field \"id\" can be null just in a case of error"}
 		}
 	default:
@@ -109,8 +109,8 @@ func ParseResponse(reader io.Reader) (Response, Error) {
 	return response, nil
 }
 
-func (r Response) HasError() bool {
-	return r.error != nil
+func (r Response) Error() Error {
+	return r.error
 }
 
 func (r Response) UnmarshalResult(value interface{}) Error {
@@ -122,7 +122,7 @@ func (r Response) UnmarshalResult(value interface{}) Error {
 
 func (r Response) MarshalJSON() ([]byte, error) {
 	body := map[string]interface{}{"jsonrpc": Version, "id": r.id}
-	if r.HasError() {
+	if r.error != nil {
 		e := map[string]interface{}{"code": r.error.code(), "message": r.error.message()}
 		if r.error.data() != nil {
 			e["data"] = r.error.data()

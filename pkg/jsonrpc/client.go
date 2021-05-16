@@ -40,7 +40,7 @@ func (c *Client) Call(request Request) Response {
 	if err := response.Body.Close(); err != nil {
 		return WithError(clientError{err})
 	}
-	if !r.HasError() && r.id != request.id {
+	if r.error == nil && r.id != request.id {
 		return WithError(idMismatch{request.id, r.id})
 	}
 	return r

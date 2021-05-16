@@ -36,7 +36,7 @@ func (s *Server) writeResponse(
 	isNotification bool,
 	writer http.ResponseWriter,
 ) {
-	if response.HasError() {
+	if response.error != nil {
 		LogError(response.error)
 	}
 	if !isNotification {

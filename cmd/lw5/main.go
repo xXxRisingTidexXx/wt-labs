@@ -26,7 +26,7 @@ func main() {
 		_ = db.Close()
 		log.Fatal(err)
 	}
-	method := "PropagateIP"
+	method := "PropagateMessage"
 	server := &http.Server{
 		Addr:           ":80",
 		ReadTimeout:    15 * time.Second,

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/xXxRisingTidexXx/wt-labs/internal/config"
 	"github.com/xXxRisingTidexXx/wt-labs/pkg/jsonrpc"
-	"net"
 	"net/http"
 	"time"
 )
@@ -28,34 +27,34 @@ func NewPropagator(method, source string, targets []string, db *sql.DB) *Propaga
 }
 
 func (p *Propagator) ServeJSONRPC(request jsonrpc.Request) jsonrpc.Response {
-	var ips []net.IP
-	if e := request.UnmarshalParams(&ips); e != nil {
+	var messages []string
+	if e := request.UnmarshalParams(&messages); e != nil {
 		return jsonrpc.WithError(e)
 	}
-	if len(ips) != 1 {
-		return jsonrpc.WithError(jsonrpc.NewInvalidParams("IP number must equal 1"))
+	if len(messages) != 1 {
+		return jsonrpc.WithError(jsonrpc.NewInvalidParams("Message number must equal 1"))
 	}
-	go p.propagateIP(ips[0])
+	go p.propagateMessage(messages[0])
 	return jsonrpc.WithResult(p.source)
 }
 
-func (p *Propagator) propagateIP(ip net.IP) {
-	targets, err := p.storeIP(ip)
+func (p *Propagator) propagateMessage(message string) {
+	targets, err := p.storeMessage(message)
 	if err != nil {
-		jsonrpc.LogError(newIPStoringError(err))
+		jsonrpc.LogError(newMessageStoringError(err))
 	} else {
 		for _, target := range targets {
-			go p.sendIP(target, ip)
+			go p.sendMessage(target, message)
 		}
 	}
 }
 
-func (p *Propagator) storeIP(ip net.IP) ([]string, error) {
+func (p *Propagator) storeMessage(message string) ([]string, error) {
 	tx, err := p.db.Begin()
 	if err != nil {
 		return nil, err
 	}
-	rows, err := tx.Query("select node from propagations where ip = $1", ip.String())
+	rows, err := tx.Query("select node from propagations where message = $1", message)
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err
@@ -86,9 +85,9 @@ func (p *Propagator) storeIP(ip net.IP) ([]string, error) {
 		return nil, nil
 	}
 	_, err = tx.Exec(
-		"insert into propagations(node, ip) values ($1, $2)",
+		"insert into propagations(node, message) values ($1, $2)",
 		p.source,
-		ip.String(),
+		message,
 	)
 	if err != nil {
 		_ = tx.Rollback()
@@ -106,8 +105,8 @@ func (p *Propagator) storeIP(ip net.IP) ([]string, error) {
 	return targets, nil
 }
 
-func (p *Propagator) sendIP(target string, ip net.IP) {
-	if request, e := jsonrpc.NewRequest(p.method, []net.IP{ip}); e != nil {
+func (p *Propagator) sendMessage(target, message string) {
+	if request, e := jsonrpc.NewRequest(p.method, []string{message}); e != nil {
 		jsonrpc.LogError(e)
 	} else if response := p.clients[target].Call(request); response.Error() != nil {
 		jsonrpc.LogError(response.Error())

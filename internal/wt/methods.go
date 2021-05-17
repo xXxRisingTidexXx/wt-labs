@@ -36,15 +36,15 @@ var StoreIP = jsonrpc.MethodFunc(
 		}
 		file, err := os.OpenFile("jsonrpc.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			return jsonrpc.WithError(newIPStoringError(err))
+			return jsonrpc.WithError(newMessageStoringError(err))
 		}
 		_, err = file.WriteString(time.Now().Format(time.RFC3339) + " " + params[0] + "\n")
 		if err != nil {
 			_ = file.Close()
-			return jsonrpc.WithError(newIPStoringError(err))
+			return jsonrpc.WithError(newMessageStoringError(err))
 		}
 		if err := file.Close(); err != nil {
-			return jsonrpc.WithError(newIPStoringError(err))
+			return jsonrpc.WithError(newMessageStoringError(err))
 		}
 		return jsonrpc.WithResult("OK")
 	},
